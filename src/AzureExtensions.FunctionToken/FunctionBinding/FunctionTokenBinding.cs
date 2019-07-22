@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
 using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C;
+using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKey;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
@@ -40,6 +41,13 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
                     new BearerTokenB2CValueProvider(
                         request,
                         tokenAzureB2COptions));
+            }
+            else if (options is TokenSinginingKeyOptions singiningKeyOptions)
+            {
+                return Task.FromResult<IValueProvider>(
+                    new SingingKeyValueProvider(
+                        request,
+                        singiningKeyOptions));
             }
             else
             {
