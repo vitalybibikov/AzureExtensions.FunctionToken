@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>AzureExtensions.FunctionToken</PackageId>
+    <PackageProjectUrl>https://github.com/vitalybibikov/AzureFunctionAuthBinding</PackageProjectUrl>
+    <Description>Extension Attribute to Azure Functions v2, that allows to obrain ClaimsPrincipal on every request.
+Currently supports key load from Azure B2C by jwks_uri and simple JsonWebKey.
+Pluggable on Azyre Function Startup</Description>
+    <Copyright>Vitali Bibikov ©</Copyright>
+    <RepositoryUrl>https://github.com/vitalybibikov/AzureFunctionAuthBinding</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>AzureFunctions Azure B2C ClaimsPrincipal</PackageTags>
+    <Version>1.0.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.5.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>    
+    <AdditionalFiles Include="..\stylecop.json" />
+  </ItemGroup>
+
+</Project>
