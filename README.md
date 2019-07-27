@@ -5,7 +5,7 @@ The extension allows you to use custom tokens in Azure Functions v2.
 
 Step 1.
 1. Add the nuget *AzureExtensions.FunctionToken*
-2. Add to StartUp file the following code.  Currently, accepts simple JWK tokens or tokens loaded out of Azure B2C
+2. Add to Startup file the following code.  Currently, accepts simple JWK tokens or tokens loaded out of Azure B2C
 
 ```
 
