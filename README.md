@@ -62,7 +62,7 @@ OR
         }}
 ```
 
-5. Currently, AF 2.0 does not support invocation to Short Circuit, so in order to return proper 401 code when Anuthorized,
+5. Currently, AF 2.0 does not support invocation to Short Circuit, so in order to return proper 401 code when UnAuthorized,
    the function should be wrapped in Handler: Wrap/WrapAsync.
    This one will return 401 if token is invalid:
    
