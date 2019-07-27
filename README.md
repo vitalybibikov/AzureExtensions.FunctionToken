@@ -5,7 +5,7 @@ The extension allows you to use custom tokens in Azure Functions v2.
 
 Step 1.
 1. Add the nuget *AzureExtensions.FunctionToken*
-2. Add to StartUp file:
+2. Add to StartUp file the following code.  Currently, accepts simple JWK tokens or tokens loaded out of Azure B2C
 
 ```
 
@@ -47,5 +47,42 @@ OR
     }
 ```
 
-4. That's it. See examples for the details.
+4. By, default AuthLevel.Authorized level is used, but you can also specify AuthLevel.AllowAnonymous
+
+
+```
+        [FunctionName("Example")]
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
+            [FunctionToken(AuthLevel.AllowAnonymous)] FunctionTokenResult token,
+            ILogger log)
+        {
+                log.LogInformation("C# HTTP trigger function processed a request.");
+                return new OkObjectResult($"Hello, {token}");
+        }}
+```
+
+5. Currently, AF 2.0 does not support invocation to Short Circuit, so in order to return proper 401 code when UnAuthorized,
+   the function should be wrapped in Handler: Wrap/WrapAsync.
+   This one will return 401 if token is invalid:
+   
+   
+```
+        [FunctionName("Example")]
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
+            [FunctionToken(AuthLevel.Authorized)] FunctionTokenResult token,
+            ILogger log)
+        {
+            return await Handler.WrapAsync(token,async () =>
+            {
+                log.LogInformation("C# HTTP trigger function processed a request.");
+                return new OkObjectResult($"Hello, {token}");
+            });
+        }
+```
+
+6.  That's it
+
+
 
