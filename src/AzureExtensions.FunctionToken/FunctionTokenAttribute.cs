@@ -1,4 +1,5 @@
 ﻿using System;
+using AzureExtensions.FunctionToken.FunctionBinding.Enums;
 using Microsoft.Azure.WebJobs.Description;
 
 namespace AzureExtensions.FunctionToken
@@ -10,5 +11,11 @@ namespace AzureExtensions.FunctionToken
     [Binding]
     public sealed class FunctionTokenAttribute : Attribute
     {
+        public AuthLevel Auth { get;  }
+
+        public FunctionTokenAttribute(AuthLevel level = AuthLevel.Authorized)
+        {
+            Auth = level;
+        }
     }
 }

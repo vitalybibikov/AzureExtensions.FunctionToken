@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Authentication;
 using System.Security.Claims;
 using AzureExtensions.FunctionToken.FunctionBinding.Enums;
 
@@ -12,38 +13,52 @@ namespace AzureExtensions.FunctionToken
 
         public Exception Exception { get; private set; }
 
-        public static FunctionTokenResult Success(ClaimsPrincipal principal)
+        public AuthLevel Level { get; private set; }
+
+        public static FunctionTokenResult Success(ClaimsPrincipal principal, AuthLevel level)
         {
             return new FunctionTokenResult
             {
                 Principal = principal,
-                Status = TokenStatus.Valid
+                Status = TokenStatus.Valid,
+                Level = level
             };
         }
 
-        public static FunctionTokenResult Expired()
+        public static FunctionTokenResult Expired(AuthLevel level)
         {
             return new FunctionTokenResult
             {
-                Status = TokenStatus.Expired
+                Status = TokenStatus.Expired,
+                Level = level
             };
         }
 
-        public static FunctionTokenResult Error(Exception ex)
+        public static FunctionTokenResult Error(Exception ex, AuthLevel level)
         {
             return new FunctionTokenResult
             {
                 Status = TokenStatus.Error,
                 Exception = ex,
+                Level = level
             };
         }
 
-        public static FunctionTokenResult Anonymous()
+        public static FunctionTokenResult Anonymous(AuthLevel level)
         {
             return new FunctionTokenResult
             {
-                Status = TokenStatus.Anonymous
+                Status = TokenStatus.Anonymous,
+                Level = level
             };
+        }
+
+        public void ValidateThrow()
+        {
+            if (Level == AuthLevel.Authorized && Status != TokenStatus.Valid)
+            {
+                throw new AuthenticationException();
+            }
         }
     }
 }

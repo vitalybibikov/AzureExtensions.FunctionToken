@@ -12,13 +12,19 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
 {
     internal abstract class BearerTokenValueProvider : IValueProvider
     {
+        public FunctionTokenAttribute InputAttribute { get; }
+
         public DefaultHttpRequest Request { get; }
 
         public ITokenOptions Options { get; }
 
         /// <inheritdoc />
-        protected BearerTokenValueProvider(DefaultHttpRequest request, ITokenOptions options)
+        protected BearerTokenValueProvider(
+            DefaultHttpRequest request, 
+            ITokenOptions options, 
+            FunctionTokenAttribute attribute)
         {
+            InputAttribute = attribute;
             Request = request;
             Options = options;
         }
@@ -29,6 +35,8 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
         /// <inheritdoc />
         public virtual async Task<object> GetValueAsync()
         {
+            var result = FunctionTokenResult.Anonymous(InputAttribute.Auth);
+
             try
             {
                 if (Request.TryGetBearerToken(out var token))
@@ -37,19 +45,19 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
                     var claimsPrincipal = new JwtSecurityTokenHandler()
                         .ValidateToken(token, validationParameters, out var securityToken);
 
-                    return FunctionTokenResult.Success(claimsPrincipal);
+                    result = FunctionTokenResult.Success(claimsPrincipal, InputAttribute.Auth);
                 }
-
-                return FunctionTokenResult.Anonymous();
             }
             catch (SecurityTokenExpiredException)
             {
-                return FunctionTokenResult.Expired();
+                result = FunctionTokenResult.Expired(InputAttribute.Auth);
             }
             catch (Exception ex)
             {
-                return FunctionTokenResult.Error(ex);
+                result = FunctionTokenResult.Error(ex, InputAttribute.Auth);
             }
+
+            return result;
         }
 
         public abstract Task<TokenValidationParameters> GetTokenValidationParametersAsync();

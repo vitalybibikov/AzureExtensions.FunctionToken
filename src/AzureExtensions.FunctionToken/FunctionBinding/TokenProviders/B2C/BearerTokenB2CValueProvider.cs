@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.IdentityModel.Tokens;
@@ -13,14 +14,22 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
         private readonly TokenAzureB2COptions options;
 
         /// <inheritdoc />
-        public BearerTokenB2CValueProvider(DefaultHttpRequest request, TokenAzureB2COptions options)
-            : base(request, options)
+        public BearerTokenB2CValueProvider(
+            DefaultHttpRequest request, 
+            TokenAzureB2COptions options, 
+            FunctionTokenAttribute attribute)
+            : base(request, options, attribute)
         {
             this.options = options;
         }
 
         public override async Task<TokenValidationParameters> GetTokenValidationParametersAsync()
         {
+            if (options.AzureB2CSingingKeyUri == null)
+            {
+                throw new ArgumentNullException(nameof(options.AzureB2CSingingKeyUri));
+            }
+
             var rsaWebKeys = await new AzureB2CTokensLoader()
                 .Load(options.AzureB2CSingingKeyUri);
 
@@ -44,7 +53,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
         public virtual async Task<object> GetValueAsync()
         {
             var result = await base.GetValueAsync();
-            var functionResult = (FunctionTokenResult) result;
+            var functionResult = (FunctionTokenResult)result;
 
             if (functionResult.Exception != null)
             {

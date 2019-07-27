@@ -15,8 +15,11 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKe
         private readonly TokenSinginingKeyOptions options;
 
         /// <inheritdoc />
-        public SingingKeyValueProvider(DefaultHttpRequest request, TokenSinginingKeyOptions options)
-            : base(request, options)
+        public SingingKeyValueProvider(
+            DefaultHttpRequest request,
+            TokenSinginingKeyOptions options,
+            FunctionTokenAttribute attribute)
+            : base(request, options, attribute)
         {
             this.options = options;
         }

@@ -1,5 +1,10 @@
-﻿using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
+﻿using System;
+using System.Threading.Tasks;
+using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
+using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.WebJobs.Description;
+using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
 
 namespace AzureExtensions.FunctionToken.FunctionBinding
@@ -21,7 +26,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
         public void Initialize(ExtensionConfigContext context)
         {
             var provider = new FunctionTokenBindingProvider(options);
-            var rule = context.AddBindingRule<FunctionTokenAttribute>()
+            context.AddBindingRule<FunctionTokenAttribute>()
                 .Bind(provider);
         }
     }

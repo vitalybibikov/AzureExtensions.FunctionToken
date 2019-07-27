@@ -16,10 +16,12 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
     internal sealed class FunctionTokenBinding : IBinding
     {
         private readonly ITokenOptions options;
+        private readonly FunctionTokenAttribute attribute;
 
-        public FunctionTokenBinding(ITokenOptions options)
+        public FunctionTokenBinding(ITokenOptions options, FunctionTokenAttribute attribute)
         {
             this.options = options;
+            this.attribute = attribute;
         }
 
         /// <inheritdoc />
@@ -40,18 +42,20 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
                 return Task.FromResult<IValueProvider>(
                     new BearerTokenB2CValueProvider(
                         request,
-                        tokenAzureB2COptions));
+                        tokenAzureB2COptions,
+                        attribute));
             }
-            else if (options is TokenSinginingKeyOptions singiningKeyOptions)
+            else if (options is TokenSinginingKeyOptions tokenSinginingKeyOptions)
             {
                 return Task.FromResult<IValueProvider>(
                     new SingingKeyValueProvider(
                         request,
-                        singiningKeyOptions));
+                        tokenSinginingKeyOptions,
+                        attribute));
             }
             else
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(options.GetType().ToString());
             }
         }
 
