@@ -1,5 +1,5 @@
 # AzureExtensions.FunctionToken
-Extension Attribute to Azure Functions v2, that allows to obrain ClaimsPrincipal on every request. Currently supports key load from Azure B2C by jwks_uri and simple JsonWebKey. Pluggable on Azyre Function Startup
+Extension Attribute to Azure Functions v2, that allows to obrain ClaimsPrincipal on every request. Currently supports key load from Azure B2C by jwks_uri and simple JsonWebKey. Pluggable into Azure Function Startup
 
 The extension allows you to use custom tokens in Azure Functions v2.
 
