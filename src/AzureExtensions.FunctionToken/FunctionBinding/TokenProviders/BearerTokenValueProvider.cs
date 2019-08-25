@@ -21,7 +21,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
         /// <inheritdoc />
         protected BearerTokenValueProvider(
             DefaultHttpRequest request, 
-            ITokenOptions options, 
+            ITokenOptions options,
             FunctionTokenAttribute attribute)
         {
             InputAttribute = attribute;
@@ -41,11 +41,13 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
             {
                 if (Request.TryGetBearerToken(out var token))
                 {
+                    Request.HttpContext.User = null;
                     var validationParameters = await GetTokenValidationParametersAsync();
-                    var claimsPrincipal = new JwtSecurityTokenHandler()
-                        .ValidateToken(token, validationParameters, out var securityToken);
+
+                    var claimsPrincipal = await GetClaimsPrincipalAsync(token, validationParameters);
 
                     result = FunctionTokenResult.Success(claimsPrincipal, InputAttribute.Auth);
+                    Request.HttpContext.User = claimsPrincipal;
                 }
             }
             catch (SecurityTokenExpiredException)
@@ -58,6 +60,15 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
             }
 
             return result;
+        }
+
+        public virtual Task<ClaimsPrincipal> GetClaimsPrincipalAsync(
+            string token,
+            TokenValidationParameters validationParameters)
+        {
+            var claimsPrincipal = new JwtSecurityTokenHandler()
+                .ValidateToken(token, validationParameters, out var securityToken);
+            return Task.FromResult(claimsPrincipal);
         }
 
         public abstract Task<TokenValidationParameters> GetTokenValidationParametersAsync();

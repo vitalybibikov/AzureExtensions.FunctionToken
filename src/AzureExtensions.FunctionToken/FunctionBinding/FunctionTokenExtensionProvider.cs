@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
-using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.WebJobs.Description;
-using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AzureExtensions.FunctionToken.FunctionBinding
 {
@@ -17,7 +14,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
     {
         private readonly ITokenOptions options;
 
-        public FunctionTokenExtensionProvider(ITokenOptions options)
+        public FunctionTokenExtensionProvider(ITokenOptions options, IServiceCollection services)
         {
             this.options = options;
         }
