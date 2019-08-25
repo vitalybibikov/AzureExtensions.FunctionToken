@@ -18,7 +18,7 @@ Step 1.
 
 ```
 
-OR
+OR B2C
 
 ```
             builder.AddAzureFunctionsToken(new TokenAzureB2COptions()
@@ -26,6 +26,15 @@ OR
                 //AzureB2CSingingKeyUri = new Uri("https://yourapp.b2clogin.com/yourapp.onmicrosoft.com/discovery/v2.0/keys?p=yourapp-policy"),
                 Audience = "your audience",
                 Issuer = "your issuer"
+            });
+
+```
+
+OR  Firebase
+```
+            builder.AddAzureFunctionsToken(new FireBaseOptions()
+            {
+                GoogleServiceAccountJsonUri = new Uri("%uri-to-storage-with-secret-json-from-google")
             });
 
 ```
