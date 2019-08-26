@@ -91,7 +91,27 @@ OR  Firebase
         }
 ```
 
-6.  That's it
+6. Also, roles as a set of strings are supported:
+   In order the role to be validated, role ClaimTypes.Role of System.Security should be presented in a token
+   It is also mapped to type:  http://schemas.microsoft.com/ws/2008/06/identity/claims/role
+
+        [FunctionName("Example")]
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
+            [FunctionToken("Manager", "Worker")] FunctionTokenResult token,
+            ClaimsPrincipal principal,
+            ILogger log)
+        {
+            var identity = token.Principal.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
+            return await Handler.WrapAsync(token,async () =>
+            {
+                log.LogInformation("C# HTTP trigger function processed a request.");
+                return new OkObjectResult($"Hello, {token}");
+            });
+        }
+
+
+7.  That's it
 
 
 
