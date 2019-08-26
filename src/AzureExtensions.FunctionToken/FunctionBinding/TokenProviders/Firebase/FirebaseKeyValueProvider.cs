@@ -34,37 +34,48 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
         {
             var tokenParams = new TokenValidationParameters
             {
-                RequireSignedTokens = true,
-
                 ValidAudience = options.Audience,
-                ValidateAudience = true,
-
-                ValidIssuer = options.Issuer,
-                ValidateIssuer = true,
-
-                ValidateLifetime = true,
+                ValidIssuer = options.Issuer
             };
+
             return Task.FromResult(tokenParams);
         }
 
         public override async Task<object> GetValueAsync()
         {
             var result = await base.GetValueAsync();
-            var functionResult = (FunctionTokenResult)result;
+
             return result;
         }
 
         public override async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string token, TokenValidationParameters validationParameters)
         {
+            //currently there is no need to validate parameters
+            // as this is performed on google's side.
             await LoadGoogleAuthJsonIfNotLoaded(options.GoogleServiceAccountJsonUri);
 
-            var decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
-            var claims = decoded.Claims.Select(claim => claim.ToClaim()).ToList();
+            try
+            {
+                var decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
+                var claims = decoded.Claims.Select(claim => claim.ToClaim()).ToList();
+                var identity = new ClaimsIdentity(claims, "Bearer");
+                var claimsPrincipal = new ClaimsPrincipal(identity);
 
-            var identity = new ClaimsIdentity(claims, "Bearer");
-
-            var claimsPrincipal = new ClaimsPrincipal(identity);
-            return claimsPrincipal;
+                return claimsPrincipal;
+            }
+            catch (FirebaseException ex)
+            {
+                //todo: unfortunately  google does not provide neither proper exception nor an error code.
+                //need to parse token and validate expiration manually
+                if (ex.Message.Contains("expired"))
+                {
+                    throw new SecurityTokenExpiredException(ex.Message, ex);
+                }
+                else
+                {
+                    throw new SecurityTokenException(ex.Message, ex);
+                }
+            }
         }
 
         private async Task LoadGoogleAuthJsonIfNotLoaded(Uri uri)

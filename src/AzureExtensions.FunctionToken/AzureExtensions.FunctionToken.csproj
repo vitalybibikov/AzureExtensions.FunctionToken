@@ -11,7 +11,7 @@ Pluggable on Azyre Function Startup</Description>
     <RepositoryUrl>https://github.com/vitalybibikov/AzureExtensions.FunctionToken</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>AzureFunctions Azure B2C ClaimsPrincipal Firebase FirebaseAdmin</PackageTags>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

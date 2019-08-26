@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.Extensions;
@@ -46,7 +47,15 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
 
                     var claimsPrincipal = await GetClaimsPrincipalAsync(token, validationParameters);
 
-                    result = FunctionTokenResult.Success(claimsPrincipal, InputAttribute.Auth);
+                    if (InputAttribute.Roles.Count > 0 && !claimsPrincipal.IsInRole(InputAttribute.Roles))
+                    {
+                        throw new AuthenticationException($"User is not in a role.");
+                    }
+                    else
+                    {
+                        result = FunctionTokenResult.Success(claimsPrincipal, InputAttribute.Auth);
+                    }
+
                     Request.HttpContext.User = claimsPrincipal;
                 }
             }
@@ -68,6 +77,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
         {
             var claimsPrincipal = new JwtSecurityTokenHandler()
                 .ValidateToken(token, validationParameters, out var securityToken);
+
             return Task.FromResult(claimsPrincipal);
         }
 

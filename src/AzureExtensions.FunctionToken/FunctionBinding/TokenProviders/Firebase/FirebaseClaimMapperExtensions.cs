@@ -12,7 +12,9 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
         {
             { "phone_number", ClaimTypes.MobilePhone },
             { "user_id", ClaimTypes.NameIdentifier },
-            { "email", JwtRegisteredClaimNames.Email }
+            { "email", JwtRegisteredClaimNames.Email },
+            { "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", ClaimTypes.Email },
+            { "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", ClaimTypes.Role }
         };
 
         public static Claim ToClaim(this KeyValuePair<string, object> dictionaryClaim)
