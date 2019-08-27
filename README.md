@@ -110,6 +110,14 @@ OR  Firebase
             });
         }
 
+ClaimsPrincipal can be injected, when 
+
+           builder.Services.AddHttpContextAccessor();
+
+attached via:
+
+           var injectedPrincipal = req.HttpContext.User;
+
 
 7.  That's it
 
