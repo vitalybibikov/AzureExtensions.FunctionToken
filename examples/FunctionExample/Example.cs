@@ -16,27 +16,23 @@ using Microsoft.Extensions.Logging;
 
 namespace FunctionExample
 {
-    public enum Enum1
-    {
-        Admin
-    }
-
-
     public class Example
     {
         [FunctionName("Example")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
-            [FunctionToken("Manager", "Worker", "Owner")] FunctionTokenResult token,
-            ClaimsPrincipal principal,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [FunctionToken("Manager", "Worker", "Owner", "Director")] FunctionTokenResult token,
             ILogger log)
         {
-            var identity = token.Principal.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
-            return await Handler.WrapAsync(token,async () =>
-            {
-                log.LogInformation("C# HTTP trigger function processed a request.");
-                return new OkObjectResult($"Hello, {token}");
-            });
+            var injectedPrincipal = req.HttpContext.User;
+
+            var identity = token.Principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            return Handler.Wrap(token, () =>
+           {
+               log.LogInformation("C# HTTP trigger function processed a request.");
+               return new OkObjectResult($"Hello, {token}");
+           });
         }
 
     }
