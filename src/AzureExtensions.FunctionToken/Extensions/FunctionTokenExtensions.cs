@@ -11,7 +11,7 @@ namespace AzureExtensions.FunctionToken.Extensions
     /// </summary>
     public static class FunctionTokenExtensions
     {
-        public static void AddAzureFunctionsToken(this IWebJobsBuilder builder, ITokenOptions options)
+        public static IWebJobsBuilder AddAzureFunctionsToken(this IWebJobsBuilder builder, ITokenOptions options)
         {
             if (builder == null)
             {
@@ -25,6 +25,8 @@ namespace AzureExtensions.FunctionToken.Extensions
 
             builder.AddExtension<FunctionTokenExtensionProvider>();
             builder.Services.AddSingleton(options);
+
+            return builder;
         }
     }
 }

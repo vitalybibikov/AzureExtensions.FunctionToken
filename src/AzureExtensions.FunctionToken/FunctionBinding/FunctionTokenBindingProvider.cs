@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
 using Microsoft.Azure.WebJobs.Host.Bindings;
-using Microsoft.Azure.WebJobs.Host.Triggers;
 
 namespace AzureExtensions.FunctionToken.FunctionBinding
 {
@@ -23,7 +22,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
                 throw new ArgumentNullException(nameof(context));
             }
 
-            ParameterInfo parameter = context.Parameter;
+            var parameter = context.Parameter;
             var attribute = parameter.GetCustomAttribute<FunctionTokenAttribute>(inherit: false);
 
             if (attribute == null)

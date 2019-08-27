@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AzureExtensions.FunctionToken;
@@ -18,15 +20,19 @@ namespace FunctionExample
     {
         [FunctionName("Example")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
-            [FunctionToken(AuthLevel.Authorized)] FunctionTokenResult token,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [FunctionToken("Manager", "Worker", "Owner", "Director")] FunctionTokenResult token,
             ILogger log)
         {
-            return await Handler.WrapAsync(token,async () =>
-            {
-                log.LogInformation("C# HTTP trigger function processed a request.");
-                return new OkObjectResult($"Hello, {token}");
-            });
+            var injectedPrincipal = req.HttpContext.User;
+
+            var identity = token.Principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            return Handler.Wrap(token, () =>
+           {
+               log.LogInformation("C# HTTP trigger function processed a request.");
+               return new OkObjectResult($"Hello, {token}");
+           });
         }
 
     }

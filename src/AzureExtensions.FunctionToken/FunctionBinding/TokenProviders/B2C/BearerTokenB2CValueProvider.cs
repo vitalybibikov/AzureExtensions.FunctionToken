@@ -50,7 +50,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
             return tokenParams;
         }
 
-        public virtual async Task<object> GetValueAsync()
+        public override async Task<object> GetValueAsync()
         {
             var result = await base.GetValueAsync();
             var functionResult = (FunctionTokenResult)result;

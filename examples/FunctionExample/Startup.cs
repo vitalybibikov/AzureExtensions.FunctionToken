@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using AzureExtensions.FunctionToken.Extensions;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using FunctionExample;
@@ -6,6 +7,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -22,11 +24,11 @@ namespace FunctionExample
                 .AddEnvironmentVariables()
                 .Build();
 
-            builder.AddAzureFunctionsToken(new TokenAzureB2COptions()
+            builder.Services.AddHttpContextAccessor();
+
+            builder.AddAzureFunctionsToken(new FireBaseOptions()
             {
-                AzureB2CSingingKeyUri = new Uri("https://yourapp.b2clogin.com/yourapp.onmicrosoft.com/discovery/v2.0/keys?p=yourapp-policy"),
-                Audience = "your audience",
-                Issuer = "your issuer"
+                GoogleServiceAccountJsonUri = new Uri("%HERE%")
             });
         }
     }

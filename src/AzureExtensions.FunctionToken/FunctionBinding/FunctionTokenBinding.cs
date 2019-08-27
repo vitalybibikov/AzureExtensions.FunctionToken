@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
 using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C;
+using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase;
 using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKey;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.WebJobs.Host.Bindings;
@@ -51,6 +52,14 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
                     new SingingKeyValueProvider(
                         request,
                         tokenSinginingKeyOptions,
+                        attribute));
+            }
+            else if (options is FireBaseOptions fireOptions)
+            {
+                return Task.FromResult<IValueProvider>(
+                    new FirebaseKeyValueProvider(
+                        request,
+                        fireOptions,
                         attribute));
             }
             else
