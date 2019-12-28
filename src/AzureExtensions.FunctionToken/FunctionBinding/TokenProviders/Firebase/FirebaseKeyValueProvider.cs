@@ -10,6 +10,7 @@ using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.IdentityModel.Tokens;
+using FirebaseAuthException = AzureExtensions.FunctionToken.Exceptions.FirebaseAuthException;
 
 namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
 {
@@ -39,13 +40,6 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
             };
 
             return Task.FromResult(tokenParams);
-        }
-
-        public override async Task<object> GetValueAsync()
-        {
-            var result = await base.GetValueAsync();
-
-            return result;
         }
 
         public override async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string token, TokenValidationParameters validationParameters)
@@ -84,19 +78,16 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
             {
                 if (FirebaseApp.DefaultInstance == null)
                 {
-                    using (var client = new HttpClient())
+                    using var httpClient = new HttpClient();
+                    var result = await httpClient.GetAsync(uri);
+
+                    if (result.IsSuccessStatusCode)
                     {
-                        using (var result = await client.GetAsync(uri))
+                        var stream = await result.Content.ReadAsStreamAsync();
+                        FirebaseApp.Create(new AppOptions
                         {
-                            if (result.IsSuccessStatusCode)
-                            {
-                                var stream = await result.Content.ReadAsStreamAsync();
-                                FirebaseApp.Create(new AppOptions
-                                {
-                                    Credential = GoogleCredential.FromStream(stream),
-                                });
-                            }
-                        }
+                            Credential = GoogleCredential.FromStream(stream),
+                        });
                     }
                 }
             }

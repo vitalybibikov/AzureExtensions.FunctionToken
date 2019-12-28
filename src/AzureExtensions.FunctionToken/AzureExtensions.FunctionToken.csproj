@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>AzureExtensions.FunctionToken</PackageId>
     <PackageProjectUrl>https://github.com/vitalybibikov/AzureExtensions.FunctionToken</PackageProjectUrl>
-    <Description>Extension Attribute to Azure Functions v2, that allows to obtain ClaimsPrincipal on a request.
-Currently supports key load from Azure B2C by jwks_uri, Firebase Auth and simple JsonWebKey.
-Pluggable on Azyre Function Startup</Description>
+    <Description>Extension Attribute to Azure Functions v3, that allows to obtain ClaimsPrincipal on a request.
+    Currently supports key load from Azure B2C by jwks_uri, Firebase Auth and simple JsonWebKey.
+    Pluggable on Azyre Function Startup</Description>
     <Copyright>Vitali Bibikov ©</Copyright>
     <RepositoryUrl>https://github.com/vitalybibikov/AzureExtensions.FunctionToken</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>AzureFunctions Azure B2C ClaimsPrincipal Firebase FirebaseAdmin</PackageTags>
-    <Version>1.0.6</Version>
+    <Version>1.0.9</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -22,14 +22,12 @@ Pluggable on Azyre Function Startup</Description>
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.5.0">
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="FirebaseAdmin" Version="1.8.0">
+    <PackageReference Include="FirebaseAdmin" Version="1.9.1">
     </PackageReference>
   </ItemGroup>
-
-  
 
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
