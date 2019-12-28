@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,7 +17,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKe
 
         /// <inheritdoc />
         public SingingKeyValueProvider(
-            DefaultHttpRequest request,
+            HttpRequest request,
             TokenSinginingKeyOptions options,
             FunctionTokenAttribute attribute)
             : base(request, options, attribute)

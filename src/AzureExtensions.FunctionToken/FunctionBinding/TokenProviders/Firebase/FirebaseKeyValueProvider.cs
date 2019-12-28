@@ -8,6 +8,7 @@ using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.IdentityModel.Tokens;
 using FirebaseAuthException = AzureExtensions.FunctionToken.Exceptions.FirebaseAuthException;
@@ -23,7 +24,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
 
         /// <inheritdoc />
         public FirebaseKeyValueProvider(
-            DefaultHttpRequest request,
+            HttpRequest request,
             FireBaseOptions options,
             FunctionTokenAttribute attribute)
             : base(request, options, attribute)

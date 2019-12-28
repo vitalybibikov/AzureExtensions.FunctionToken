@@ -5,7 +5,7 @@ using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
 using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C;
 using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase;
 using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKey;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 
@@ -31,7 +31,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
         /// <inheritdoc />
         public Task<IValueProvider> BindAsync(BindingContext context)
         {
-            var request = context.BindingData["$request"] as DefaultHttpRequest;
+            var request = context.BindingData["$request"] as HttpRequest;
 
             if (request == null)
             {

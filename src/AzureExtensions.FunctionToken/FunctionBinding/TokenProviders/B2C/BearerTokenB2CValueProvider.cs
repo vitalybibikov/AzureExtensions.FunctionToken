@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,7 +16,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 
         /// <inheritdoc />
         public BearerTokenB2CValueProvider(
-            DefaultHttpRequest request, 
+            HttpRequest request, 
             TokenAzureB2COptions options, 
             FunctionTokenAttribute attribute)
             : base(request, options, attribute)

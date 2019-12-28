@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.Extensions;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.IdentityModel.Tokens;
@@ -15,13 +16,13 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
     {
         public FunctionTokenAttribute InputAttribute { get; }
 
-        public DefaultHttpRequest Request { get; }
+        public HttpRequest Request { get; }
 
         public ITokenOptions Options { get; }
 
         /// <inheritdoc />
         protected BearerTokenValueProvider(
-            DefaultHttpRequest request, 
+            HttpRequest request, 
             ITokenOptions options,
             FunctionTokenAttribute attribute)
         {

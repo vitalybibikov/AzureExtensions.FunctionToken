@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using AzureExtensions.FunctionToken.FunctionBinding.Constants;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 
 namespace AzureExtensions.FunctionToken.Extensions
 {
-    internal static class DefaultHttpRequestExtensions
+    internal static class HttpRequestExtensions
     {
-        public static bool TryGetBearerToken(this DefaultHttpRequest message, out string token)
+        public static bool TryGetBearerToken(this HttpRequest message, out string token)
         {
             token = null;
             var isAuthHeaderPresented = message.Headers.Any(x => x.Key == BearerConstants.AUTH_TYPE) &&
