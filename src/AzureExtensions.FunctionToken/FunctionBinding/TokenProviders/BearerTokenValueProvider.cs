@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.AccessControl;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.Extensions;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.IdentityModel.Tokens;
 
@@ -50,7 +50,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
 
                     if (InputAttribute.Roles.Count > 0 && !claimsPrincipal.IsInRole(InputAttribute.Roles))
                     {
-                        throw new AuthenticationException($"User is not in a role.");
+                        throw new PrivilegeNotHeldException($"User is not in a valid role. Valid roles include: {string.Join(" ", InputAttribute.Roles)}.");
                     }
                     else
                     {
@@ -58,6 +58,10 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
                     }
 
                     Request.HttpContext.User = claimsPrincipal;
+                }
+                else
+                {
+                    throw new AuthenticationException("No authentication provided in request.");
                 }
             }
             catch (SecurityTokenExpiredException)

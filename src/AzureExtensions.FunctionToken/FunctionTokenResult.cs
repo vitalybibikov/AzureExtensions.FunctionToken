@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Authentication;
 using System.Security.Claims;
 using AzureExtensions.FunctionToken.FunctionBinding.Enums;
 
@@ -57,7 +56,7 @@ namespace AzureExtensions.FunctionToken
         {
             if (Level == AuthLevel.Authorized && Status != TokenStatus.Valid)
             {
-                throw new AuthenticationException();
+                throw Exception;
             }
         }
     }
