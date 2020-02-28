@@ -1,0 +1,70 @@
+# This specifies the CI trigger to only look at the master branch
+# Without an explicit trigger:, the implicit, default is to do CI builds on every branch
+# PR Triggers are defined PR:, the default being to build ever PR.
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/build/triggers?view=azure-devops&tabs=yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+ 
+variables: 
+  BuildConfiguration: 'Release'
+  VersionNumberConfigurationFile: 'GitVersion.yml'
+  SlnToBuild: 'FunctionToken.sln'
+  ProjectsToPack: '.\src\AzureExtensions.FunctionToken\AzureExtensions.FunctionToken.csproj'
+
+steps:
+
+# Right now this is hardcoded as the suggested 3.x from here(https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/tool/dotnet-core-tool-installer?view=azure-devops) appears unsupported
+
+- task: gittools.gitversion.gitversion-task.GitVersion@5
+  displayName: 'Update build/release version using GitVersion'
+  inputs:
+    useConfigFile: true
+    configFilePath: GitVersion.yml
+
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK 3.* (for xUnit)'
+  inputs:
+    version: 3.1.x
+
+- task: DotNetCoreCLI@2 
+  displayName: 'Restore NuGet Packages and Authenticate to Feed'
+  inputs:
+    command: restore
+    projects: '$(SlnToBuild)'
+
+- task: DotNetCoreCLI@2 
+  displayName: 'Build Solution' 
+  inputs:
+    command: build
+    projects: '$(SlnToBuild)'
+    includeNuGetOrg: true
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(GitVersion.NuGetVersion)'
+    versioningScheme: byBuildNumber
+
+- task: DotNetCoreCLI@2
+  displayName: 'Unit Tests'
+  inputs:
+    command: 'test'
+    projects: '$(SlnToBuild)'
+    testRunTitle: 'Unit Tests'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Package Library as NuPkg' 
+  inputs: 
+    command: pack
+    packagesToPack: '$(ProjectsToPack)' 
+    nobuild: true
+    arguments: '--no-dependencies --force --no-cache'
+    versioningScheme: byEnvVar 
+    versionEnvVar: GitVersion.NuGetVersion
+
+- task: DotNetCoreCLI@2 
+  displayName: 'Publish NuGet Package' 
+  inputs:
+    command: push
+    feedPublish: 'hashrocket_feed'
+    versioningScheme: byBuildNumber
