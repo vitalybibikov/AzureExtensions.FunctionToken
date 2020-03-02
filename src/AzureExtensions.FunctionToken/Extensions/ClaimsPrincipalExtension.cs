@@ -46,6 +46,45 @@ namespace AzureExtensions.FunctionToken.Extensions
         }
 
         /// <summary>
+        ///     Finds scp (Scope) if claim is set in the principal.
+        /// </summary>
+        public static bool IsInScope(this ClaimsPrincipal principal, IEnumerable<string> requiredScopes)
+        {
+            // Acquire the scopes reported by ClaimsPrincipal
+            var scopesClaim = principal.Claims.FirstOrDefault(x => x.Type == "scp");
+
+            // If there are no scopes listed then accept anything
+            if (requiredScopes == null || requiredScopes.Count() == 0)
+            {
+                return true;
+            }
+            else if (scopesClaim != null) // see if there are any scopes
+            {
+                // Make the assumption that scopes are case invariant
+                HashSet<string> lowercaseRequiredScopes = requiredScopes.Select(s => s.ToLowerInvariant()).ToHashSet();
+
+                if (scopesClaim.ValueType == ClaimValueTypes.String || scopesClaim.ValueType == typeof(string).ToString())
+                {
+                    // Scopes are returned as whitespace delimited strings
+                    // There could be many scopes on a single claim so we separate and lowercase them
+                    IEnumerable<string> scopesFromClaim = scopesClaim.Value.Split(' ').Select(c => c.ToLowerInvariant());
+
+                    // Iterate over the scopes from the Claim checking if appropriate
+                    foreach (string possibleScope in scopesFromClaim)
+                    {
+                        if (lowercaseRequiredScopes.Contains(possibleScope))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // Otherwise the required scopes do not exist
+            return false;
+        }
+
+        /// <summary>
         ///     Finds role if claim <see cref="ClaimTypes.Role" /> is set in the principal.
         /// </summary>
         internal static bool IsRoleSet(this ClaimsPrincipal principal)

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
+using AzureExtensions.FunctionToken.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
@@ -58,11 +58,6 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
             TokenValidationParameters validationParameters)
         {
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            jwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>
-            {
-                { "scp", ClaimTypes.Role }
-            };
-            jwtSecurityTokenHandler.MapInboundClaims = true;
 
             return Task.FromResult(
                 jwtSecurityTokenHandler.ValidateToken(
@@ -87,6 +82,11 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
             }
 
             return result;
+        }
+
+        protected override bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal.IsInScope(InputAttribute.Roles);
         }
     }
 }
