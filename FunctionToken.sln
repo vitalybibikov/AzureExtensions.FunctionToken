@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureExtensions.FunctionTok
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionExample", "examples\FunctionExample\FunctionExample.csproj", "{4E509053-B882-4E64-984C-667595FB7129}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E54D6743-2664-41B1-B59C-D833FFA832D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureExtensions.FunctionToken.tests", "test\AzureExtensions.FunctionToken.tests\AzureExtensions.FunctionToken.tests.csproj", "{CD70D019-C271-474F-AB0A-9FBD84AC490E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +25,18 @@ Global
 		{4E509053-B882-4E64-984C-667595FB7129}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E509053-B882-4E64-984C-667595FB7129}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E509053-B882-4E64-984C-667595FB7129}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD70D019-C271-474F-AB0A-9FBD84AC490E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD70D019-C271-474F-AB0A-9FBD84AC490E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD70D019-C271-474F-AB0A-9FBD84AC490E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD70D019-C271-474F-AB0A-9FBD84AC490E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25CD4E66-7A3B-474D-BD94-461C07F62D07}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CD70D019-C271-474F-AB0A-9FBD84AC490E} = {E54D6743-2664-41B1-B59C-D833FFA832D5}
 	EndGlobalSection
 EndGlobal

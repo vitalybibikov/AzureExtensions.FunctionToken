@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AzureExtensions.FunctionToken.FunctionBinding.Enums;
 using Microsoft.Azure.WebJobs.Description;
 
+[assembly: InternalsVisibleTo("AzureExtensions.FunctionToken.Tests")]
 namespace AzureExtensions.FunctionToken
 {
     /// <summary>
@@ -14,34 +16,40 @@ namespace AzureExtensions.FunctionToken
     {
         public AuthLevel Auth { get;  }
 
-        public List<string> Roles { get; } = new List<string>();
+        public string ScopeRequired { get; }
+        public List<string> Roles { get; }
 
-        public FunctionTokenAttribute(AuthLevel level = AuthLevel.Authorized)
+        public FunctionTokenAttribute(
+            AuthLevel level,
+            string scope,
+            string[] roles
+        )
         {
             Auth = level;
-        }
-
-        public FunctionTokenAttribute(AuthLevel level = AuthLevel.Authorized, params string[] roles)
-        {
+            ScopeRequired = scope;
+            Roles = new List<string>();
             if (roles != null)
             {
                 Roles.AddRange(roles);
             }
-           
-            Auth = level;
         }
 
-        public FunctionTokenAttribute(params string[] roles)
+        public FunctionTokenAttribute(AuthLevel level = AuthLevel.Authorized):
+        this (
+            level,
+            "",
+            null
+        )
         {
-            if (roles != null)
-            {
-                Auth = AuthLevel.Authorized;
-                Roles.AddRange(roles);
-            }
-            else
-            {
-                Auth = AuthLevel.AllowAnonymous;
-            }
+        }
+
+        public FunctionTokenAttribute(string[] roles) :
+        this (
+            roles != null ? AuthLevel.Authorized : AuthLevel.AllowAnonymous,
+            "",
+            roles
+        )
+        {
         }
     }
 }

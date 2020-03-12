@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.Exceptions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
+[assembly: InternalsVisibleTo("AzureExtensions.FunctionToken.Tests")]
 namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 {
-    internal class AzureB2CTokensLoader
+    internal class AzureB2CTokensLoader : IAzureB2CTokensLoader
     {
         private static List<JsonWebKey> keys = new List<JsonWebKey>();
 
         /// <summary>
-        /// Loads the keys by uri or  from static cache.
+        /// Loads the keys by uri or from static cache.
         /// </summary>
         public async Task<List<JsonWebKey>> Load(Uri uri)
         {
@@ -52,5 +54,11 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
                 }
             }
         }
+    }
+
+    public interface IAzureB2CTokensLoader
+    {
+        Task<List<JsonWebKey>> Load(Uri uri);
+        Task<List<JsonWebKey>> Reload(Uri uri);
     }
 }

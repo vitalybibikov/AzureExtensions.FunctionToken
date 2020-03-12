@@ -48,21 +48,22 @@ namespace AzureExtensions.FunctionToken.Extensions
         /// <summary>
         ///     Finds scp (Scope) if claim is set in the principal.
         /// </summary>
-        public static bool IsInScope(this ClaimsPrincipal principal, IEnumerable<string> requiredScopes)
+        public static bool IsInScope(this ClaimsPrincipal principal, string requiredScope)
         {
             // Acquire the scopes reported by ClaimsPrincipal
-            var scopesClaim = principal.Claims.FirstOrDefault(x => x.Type == "scp");
+            var scopesClaim = principal
+                .Identities
+                .FirstOrDefault()?
+                .Claims
+                .FirstOrDefault(x => x.Type == "scp");
 
             // If there are no scopes listed then accept anything
-            if (requiredScopes == null || requiredScopes.Count() == 0)
+            if (requiredScope == null || requiredScope.Count() == 0)
             {
                 return true;
             }
             else if (scopesClaim != null) // see if there are any scopes
             {
-                // Make the assumption that scopes are case invariant
-                HashSet<string> lowercaseRequiredScopes = requiredScopes.Select(s => s.ToLowerInvariant()).ToHashSet();
-
                 if (scopesClaim.ValueType == ClaimValueTypes.String || scopesClaim.ValueType == typeof(string).ToString())
                 {
                     // Scopes are returned as whitespace delimited strings
@@ -72,7 +73,8 @@ namespace AzureExtensions.FunctionToken.Extensions
                     // Iterate over the scopes from the Claim checking if appropriate
                     foreach (string possibleScope in scopesFromClaim)
                     {
-                        if (lowercaseRequiredScopes.Contains(possibleScope))
+                        // Make the assumption that scopes are case invariant
+                        if (requiredScope.Equals(possibleScope, StringComparison.InvariantCultureIgnoreCase))
                         {
                             return true;
                         }

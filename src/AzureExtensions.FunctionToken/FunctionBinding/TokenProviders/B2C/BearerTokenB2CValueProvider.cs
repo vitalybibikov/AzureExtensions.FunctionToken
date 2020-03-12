@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AzureExtensions.FunctionToken.FunctionBinding.Options;
-using AzureExtensions.FunctionToken.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
+using AzureExtensions.FunctionToken.Extensions;
+using AzureExtensions.FunctionToken.FunctionBinding.Options;
 
+[assembly: InternalsVisibleTo("AzureExtensions.FunctionToken.Tests")]
 namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 {
     /// <summary>
@@ -15,15 +17,29 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
     internal class BearerTokenB2CValueProvider : BearerTokenValueProvider
     {
         private readonly TokenAzureB2COptions options;
+        private IAzureB2CTokensLoader azureB2CTokensLoader;
+        private ISecurityTokenValidator securityTokenValidator;
 
         /// <inheritdoc />
         public BearerTokenB2CValueProvider(
             HttpRequest request, 
             TokenAzureB2COptions options, 
             FunctionTokenAttribute attribute)
+            : this(request, options, attribute, new AzureB2CTokensLoader(), new JwtSecurityTokenHandler())
+        {
+        }
+
+        public BearerTokenB2CValueProvider(
+            HttpRequest request, 
+            TokenAzureB2COptions options, 
+            FunctionTokenAttribute attribute,
+            IAzureB2CTokensLoader loader,
+            ISecurityTokenValidator securityHandler)
             : base(request, options, attribute)
         {
             this.options = options;
+            azureB2CTokensLoader = loader;
+            securityTokenValidator = securityHandler;
         }
 
         public override async Task<TokenValidationParameters> GetTokenValidationParametersAsync()
@@ -33,7 +49,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
                 throw new ArgumentNullException(nameof(options.AzureB2CSingingKeyUri));
             }
 
-            var rsaWebKeys = await new AzureB2CTokensLoader()
+            var rsaWebKeys = await azureB2CTokensLoader
                 .Load(options.AzureB2CSingingKeyUri);
 
             var tokenParams = new TokenValidationParameters
@@ -55,12 +71,11 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 
         public override Task<ClaimsPrincipal> GetClaimsPrincipalAsync(
             string token,
-            TokenValidationParameters validationParameters)
+            TokenValidationParameters validationParameters
+        )
         {
-            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-
             return Task.FromResult(
-                jwtSecurityTokenHandler.ValidateToken(
+                securityTokenValidator.ValidateToken(
                     token,
                     validationParameters,
                     out var securityToken
@@ -75,7 +90,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 
             if (functionResult.Exception != null)
             {
-                await new AzureB2CTokensLoader()
+                await azureB2CTokensLoader
                     .Reload(options.AzureB2CSingingKeyUri);
 
                 result = await base.GetValueAsync();
@@ -86,7 +101,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 
         protected override bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.IsInScope(InputAttribute.Roles);
+            return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired);
         }
     }
 }

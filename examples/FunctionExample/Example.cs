@@ -18,8 +18,8 @@ namespace FunctionExample
     {
         [FunctionName("Example")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            [FunctionToken("Manager", "Worker", "Owner", "Director")] FunctionTokenResult token,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "example")] HttpRequest req,
+            [FunctionToken(new string[] {"Manager", "Worker", "Owner", "Director"})] FunctionTokenResult token,
             ILogger log)
         {
             var injectedPrincipal = req.HttpContext.User;
