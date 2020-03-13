@@ -83,6 +83,14 @@ namespace AzureExtensions.FunctionToken.Tests
             public IEnumerator<object[]> GetEnumerator()
             {
                 // No Scopes or Roles Required on Function
+                
+                yield return new object[] {
+                    null,
+                    null,
+                    new List<Claim>(),
+                    TokenStatus.Valid
+                };
+                
                 yield return new object[] {
                     null,
                     new string[] {},
@@ -97,13 +105,20 @@ namespace AzureExtensions.FunctionToken.Tests
                     TokenStatus.Valid
                 };
 
+                yield return new object[] {
+                    "",
+                    null,
+                    new List<Claim>(),
+                    TokenStatus.Valid
+                };
+
                 // Only  scope is required
                 yield return new object[] {
                     "read",
-                    new string[] {},
+                    null,
                     new List<Claim> 
                     {
-                        new Claim("scp", "Read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "Read"),
                     },
                     TokenStatus.Valid
                 };
@@ -113,8 +128,35 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {},
                     new List<Claim> 
                     {
-                        new Claim("scp", "Different Scope"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "Read"),
                     },
+                    TokenStatus.Valid
+                };
+
+                yield return new object[] {
+                    "read",
+                    new string[] {},
+                    new List<Claim> 
+                    {
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "Different Scope"),
+                    },
+                    TokenStatus.Error
+                };
+
+                yield return new object[] {
+                    "read",
+                    null,
+                    new List<Claim> 
+                    {
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "Different Scope"),
+                    },
+                    TokenStatus.Error
+                };
+                
+                yield return new object[] {
+                    "read",
+                    null,
+                    new List<Claim> (),
                     TokenStatus.Error
                 };
                 
@@ -128,10 +170,20 @@ namespace AzureExtensions.FunctionToken.Tests
                 // Handle multiple scopes in returned claim
                 yield return new object[] {
                     "read",
+                    null,
+                    new List<Claim> 
+                    {
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "write read"),
+                    },
+                    TokenStatus.Valid
+                };
+
+                yield return new object[] {
+                    "read",
                     new string[] {},
                     new List<Claim> 
                     {
-                        new Claim("scp", "write read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "write read"),
                     },
                     TokenStatus.Valid
                 };
@@ -142,7 +194,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim("scp", "read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "read"),
                     },
                     TokenStatus.Error
                 };
@@ -152,7 +204,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim("scp", "write read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "write read"),
                     },
                     TokenStatus.Error
                 };
@@ -162,7 +214,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim("scp", "read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "read"),
                         new Claim(ClaimTypes.Role, "nonuser")
                     },
                     TokenStatus.Error
@@ -173,7 +225,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim("scp", "read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "read"),
                         new Claim(ClaimTypes.Role, "user")
                     },
                     TokenStatus.Valid
@@ -184,7 +236,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim("scp", "write read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "write read"),
                         new Claim(ClaimTypes.Role, "user")
                     },
                     TokenStatus.Valid
@@ -195,7 +247,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"admin", "user"},
                     new List<Claim> 
                     {
-                        new Claim("scp", "read"),
+                        new Claim("http://schemas.microsoft.com/identity/claims/scope", "read"),
                         new Claim(ClaimTypes.Role, "user")
                     },
                     TokenStatus.Valid

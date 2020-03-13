@@ -48,17 +48,17 @@ namespace AzureExtensions.FunctionToken.Extensions
         /// <summary>
         ///     Finds scp (Scope) if claim is set in the principal.
         /// </summary>
-        public static bool IsInScope(this ClaimsPrincipal principal, string requiredScope)
+        public static bool IsInScope(this ClaimsPrincipal principal, string requiredScope, string scopeFieldName = "scp")
         {
             // Acquire the scopes reported by ClaimsPrincipal
             var scopesClaim = principal
                 .Identities
                 .FirstOrDefault()?
                 .Claims
-                .FirstOrDefault(x => x.Type == "scp");
+                .FirstOrDefault(x => x.Type == scopeFieldName);
 
             // If there are no scopes listed then accept anything
-            if (requiredScope == null || requiredScope.Count() == 0)
+            if (requiredScope == null || requiredScope == "")
             {
                 return true;
             }

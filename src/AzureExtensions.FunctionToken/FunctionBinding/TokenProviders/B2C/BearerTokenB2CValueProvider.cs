@@ -16,6 +16,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
     /// </summary>
     internal class BearerTokenB2CValueProvider : BearerTokenValueProvider
     {
+        private const string ScopeClaimNameFromPrincipal = "http://schemas.microsoft.com/identity/claims/scope";
         private readonly TokenAzureB2COptions options;
         private IAzureB2CTokensLoader azureB2CTokensLoader;
         private ISecurityTokenValidator securityTokenValidator;
@@ -101,7 +102,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 
         protected override bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired)
+            return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired, ScopeClaimNameFromPrincipal)
                 && base.IsAuthorizedForAction(claimsPrincipal);
         }
     }
