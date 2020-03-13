@@ -49,7 +49,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
 
                     var claimsPrincipal = await GetClaimsPrincipalAsync(token, validationParameters);
 
-                    if (InputAttribute.Roles.Count > 0 && !IsAuthorizedForAction(claimsPrincipal))
+                    if (!IsAuthorizedForAction(claimsPrincipal))
                     {
                         throw new PrivilegeNotHeldException($"User is not in a valid role. Valid roles include: {string.Join(" ", InputAttribute.Roles)}.");
                     }
@@ -100,7 +100,9 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
         /// </summary>
         protected virtual bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.IsInRole(InputAttribute.Roles);
+            return InputAttribute.Roles == null
+                || InputAttribute.Roles.Count == 0 
+                || claimsPrincipal.IsInRole(InputAttribute.Roles);
         }
     }
 }

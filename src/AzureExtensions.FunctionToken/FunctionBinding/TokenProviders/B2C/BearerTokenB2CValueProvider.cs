@@ -101,7 +101,8 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
 
         protected override bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired);
+            return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired)
+                && base.IsAuthorizedForAction(claimsPrincipal);
         }
     }
 }
