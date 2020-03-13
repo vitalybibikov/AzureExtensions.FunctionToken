@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.AccessControl;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,13 @@ namespace AzureExtensions.FunctionToken
             {
                 return new UnauthorizedResult();
             }
+            catch (PrivilegeNotHeldException)
+            {
+                var r = new ForbidResult(
+                    "Bearer"
+                );
+                return r;
+            }
             catch (Exception ex)
             {
                 return new BadRequestObjectResult(ex.Message);
@@ -41,6 +49,14 @@ namespace AzureExtensions.FunctionToken
             {
                 logger?.LogWarning(ex.Message, ex);
                 return new UnauthorizedResult();
+            }
+            catch (PrivilegeNotHeldException ex)
+            {
+                logger?.LogWarning(ex.Message, ex);
+                var r = new ForbidResult(
+                    "Bearer"
+                );
+                return r;
             }
             catch (Exception ex)
             {
@@ -63,6 +79,11 @@ namespace AzureExtensions.FunctionToken
             catch (AuthenticationException)
             {
                 return new UnauthorizedResult();
+            }
+            catch (PrivilegeNotHeldException)
+            {
+                var r = new ForbidResult("Bearer");
+                return r;
             }
             catch (Exception ex)
             {
