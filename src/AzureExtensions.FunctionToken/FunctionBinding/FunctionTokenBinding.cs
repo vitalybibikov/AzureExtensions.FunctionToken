@@ -49,7 +49,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
             else if (options is TokenSinginingKeyOptions tokenSinginingKeyOptions)
             {
                 return Task.FromResult<IValueProvider>(
-                    new SingingKeyValueProvider(
+                    new SigningKeyValueProvider(
                         request,
                         tokenSinginingKeyOptions,
                         attribute));

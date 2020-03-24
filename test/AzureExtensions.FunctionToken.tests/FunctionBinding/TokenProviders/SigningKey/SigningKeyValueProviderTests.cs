@@ -2,10 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Enums;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
-using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C;
+using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKey;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
@@ -14,10 +13,8 @@ using Xunit;
 
 namespace AzureExtensions.FunctionToken.Tests
 {
-    public class BearerTokenB2CValueProviderTests
+    public class SigningKeyValueProviderTests
     {
-        private const string B2CScopeClaimName = "http://schemas.microsoft.com/identity/claims/scope";
-
         [Theory]
         [ClassData(typeof(UnitsTestData))]
         public void GetValueAsyncWorksForScope(string requiredScope, string[] authorizedRoles, List<Claim> claims, TokenStatus tokenStatus)
@@ -29,8 +26,24 @@ namespace AzureExtensions.FunctionToken.Tests
             request
                 .SetupGet(r => r.HttpContext)
                 .Returns(Mock.Of<HttpContext>());
-            TokenAzureB2COptions options = new TokenAzureB2COptions {
-                AzureB2CSingingKeyUri = new Uri("http://localhost:7001")
+            TokenSinginingKeyOptions options = new TokenSinginingKeyOptions {
+                SigningKey = JsonWebKey.Create(
+                    @"{
+                        ""alg"": ""RS256"",
+                        ""kty"": ""RSA"",
+                        ""use"": ""sig"",
+                        ""n"": ""fasdklfjahsdfkaljsnddfnlkasudvgiuq3450897uzxcvnlksdfn---aserkfjasbvdkluy3t45r"",
+                        ""e"": ""AQAB"",
+                        ""kid"": ""NKJLGHLJKHGBVKBLKJAFUYKJHBFADF"",
+                        ""x5t"": ""NKJLGHLJKHGBVKBLKJAFUYKJHBFADF"",
+                        ""x5c"": [
+                            ""hkjlgrhkljzvkzjhlgvzvdklhvzsilseujrgfoisyehfltw34to--=sdfghzksujfdhgi7tsertukjhask.fhcgfalsiyuegrht.jklw34batgfklyuasgdvkjsdrbg=""
+                        ]
+
+                    }"
+                ),
+                Issuer = "http://iamanissuerofauthtokens.com",
+                Audience = "some audience",
             };
             FunctionTokenAttribute attribute = new FunctionTokenAttribute(
                 AuthLevel.Authorized,
@@ -38,13 +51,6 @@ namespace AzureExtensions.FunctionToken.Tests
                 authorizedRoles
             );
             SecurityToken mockSecurityToken = Mock.Of<SecurityToken>();
-            Mock<IAzureB2CTokensLoader> mockLoader = new Mock<IAzureB2CTokensLoader>();
-            mockLoader
-                .Setup(l => l.Load(It.IsAny<Uri>()))
-                .Returns(Task<List<JsonWebKey>>.Factory.StartNew( o => new List<JsonWebKey>(), null));
-            mockLoader
-                .Setup(l => l.Reload(It.IsAny<Uri>()))
-                .Returns(Task<List<JsonWebKey>>.Factory.StartNew( o => new List<JsonWebKey>(), null));
             Mock<ISecurityTokenValidator> mockSecurityTokenValidator = new Mock<ISecurityTokenValidator>();
             mockSecurityTokenValidator
                 .Setup(v => v.ValidateToken(
@@ -63,11 +69,10 @@ namespace AzureExtensions.FunctionToken.Tests
                     })
                 );
 
-            BearerTokenB2CValueProvider provider = new BearerTokenB2CValueProvider(
+            SigningKeyValueProvider provider = new SigningKeyValueProvider(
                 request.Object,
                 options,
                 attribute,
-                mockLoader.Object,
                 mockSecurityTokenValidator.Object
             );
             
@@ -120,7 +125,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     null,
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "Read"),
+                        new Claim("scp", "Read"),
                     },
                     TokenStatus.Valid
                 };
@@ -130,7 +135,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "Read"),
+                        new Claim("scp", "Read"),
                     },
                     TokenStatus.Valid
                 };
@@ -140,7 +145,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "Different Scope"),
+                        new Claim("scp", "Different Scope"),
                     },
                     TokenStatus.Error
                 };
@@ -150,7 +155,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     null,
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "Different Scope"),
+                        new Claim("scp", "Different Scope"),
                     },
                     TokenStatus.Error
                 };
@@ -175,7 +180,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     null,
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "write read"),
+                        new Claim("scp", "write read"),
                     },
                     TokenStatus.Valid
                 };
@@ -185,7 +190,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "write read"),
+                        new Claim("scp", "write read"),
                     },
                     TokenStatus.Valid
                 };
@@ -196,7 +201,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "read"),
+                        new Claim("scp", "read"),
                     },
                     TokenStatus.Error
                 };
@@ -206,7 +211,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "write read"),
+                        new Claim("scp", "write read"),
                     },
                     TokenStatus.Error
                 };
@@ -216,7 +221,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "read"),
+                        new Claim("scp", "read"),
                         new Claim(ClaimTypes.Role, "nonuser")
                     },
                     TokenStatus.Error
@@ -227,7 +232,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "read"),
+                        new Claim("scp", "read"),
                         new Claim(ClaimTypes.Role, "user")
                     },
                     TokenStatus.Valid
@@ -238,7 +243,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"user"},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "write read"),
+                        new Claim("scp", "write read"),
                         new Claim(ClaimTypes.Role, "user")
                     },
                     TokenStatus.Valid
@@ -249,7 +254,7 @@ namespace AzureExtensions.FunctionToken.Tests
                     new string[] {"admin", "user"},
                     new List<Claim> 
                     {
-                        new Claim(B2CScopeClaimName, "read"),
+                        new Claim("scp", "read"),
                         new Claim(ClaimTypes.Role, "user")
                     },
                     TokenStatus.Valid

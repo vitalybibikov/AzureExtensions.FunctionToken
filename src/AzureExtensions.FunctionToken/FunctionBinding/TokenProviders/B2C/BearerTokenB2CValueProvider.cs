@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -19,7 +19,6 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
         private const string ScopeClaimNameFromPrincipal = "http://schemas.microsoft.com/identity/claims/scope";
         private readonly TokenAzureB2COptions options;
         private IAzureB2CTokensLoader azureB2CTokensLoader;
-        private ISecurityTokenValidator securityTokenValidator;
 
         /// <inheritdoc />
         public BearerTokenB2CValueProvider(
@@ -36,11 +35,10 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
             FunctionTokenAttribute attribute,
             IAzureB2CTokensLoader loader,
             ISecurityTokenValidator securityHandler)
-            : base(request, options, attribute)
+            : base(request, options, attribute, securityHandler)
         {
             this.options = options;
             azureB2CTokensLoader = loader;
-            securityTokenValidator = securityHandler;
         }
 
         public override async Task<TokenValidationParameters> GetTokenValidationParametersAsync()
@@ -69,20 +67,6 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
             };
             return tokenParams;
         }
-
-        public override Task<ClaimsPrincipal> GetClaimsPrincipalAsync(
-            string token,
-            TokenValidationParameters validationParameters
-        )
-        {
-            return Task.FromResult(
-                securityTokenValidator.ValidateToken(
-                    token,
-                    validationParameters,
-                    out var securityToken
-                )
-            );
-        }
         
         public override async Task<object> GetValueAsync()
         {
@@ -103,7 +87,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.B2C
         protected override bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
         {
             return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired, ScopeClaimNameFromPrincipal)
-                && base.IsAuthorizedForAction(claimsPrincipal);
+                && claimsPrincipal.IsInRole(InputAttribute.Roles);
         }
     }
 }

@@ -31,18 +31,22 @@ namespace AzureExtensions.FunctionToken.Extensions
         /// </summary>
         public static bool IsInRole(this ClaimsPrincipal principal, IEnumerable<string> roles)
         {
-            var result = false;
             var claimRole = principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role);
-
-            if (claimRole != null && roles != null)
+            if (roles == null // Not Defined
+                || roles.Count() == 0 // No Roles Required
+            )
             {
-                if (claimRole.ValueType == ClaimValueTypes.String || claimRole.ValueType == typeof(string).ToString())
+                return true;
+            }
+            else if (claimRole != null) // A required role is defined and there is at least one available in principal
+            {
+                if (claimRole.ValueType == ClaimValueTypes.String || claimRole.ValueType == typeof(string).ToString()) // Ensure it is the right type
                 {
-                    result = roles.Any(s => s.Equals(claimRole.Value, StringComparison.OrdinalIgnoreCase));
+                    return roles.Any(s => s.Equals(claimRole.Value, StringComparison.OrdinalIgnoreCase)); // Check if the required roles are equal to any of the claimed roles
                 }
             }
 
-            return result;
+            return false; // not in role
         }
 
         /// <summary>

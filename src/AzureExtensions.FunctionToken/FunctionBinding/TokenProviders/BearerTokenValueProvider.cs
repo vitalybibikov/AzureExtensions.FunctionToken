@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Authentication;
 using System.Security.Claims;
@@ -20,16 +18,19 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
         public HttpRequest Request { get; }
 
         public ITokenOptions Options { get; }
+        private ISecurityTokenValidator securityTokenValidator;
 
         /// <inheritdoc />
         protected BearerTokenValueProvider(
             HttpRequest request, 
             ITokenOptions options,
-            FunctionTokenAttribute attribute)
+            FunctionTokenAttribute attribute,
+            ISecurityTokenValidator tokenValidator)
         {
             InputAttribute = attribute;
             Request = request;
             Options = options;
+            securityTokenValidator = tokenValidator;
         }
 
         /// <inheritdoc />
@@ -79,12 +80,16 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
 
         public virtual Task<ClaimsPrincipal> GetClaimsPrincipalAsync(
             string token,
-            TokenValidationParameters validationParameters)
+            TokenValidationParameters validationParameters
+        )
         {
-            var claimsPrincipal = new JwtSecurityTokenHandler()
-                .ValidateToken(token, validationParameters, out var securityToken);
-
-            return Task.FromResult(claimsPrincipal);
+            return Task.FromResult(
+                securityTokenValidator.ValidateToken(
+                    token,
+                    validationParameters,
+                    out var securityToken
+                )
+            );
         }
 
         public abstract Task<TokenValidationParameters> GetTokenValidationParametersAsync();
@@ -100,9 +105,8 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders
         /// </summary>
         protected virtual bool IsAuthorizedForAction(ClaimsPrincipal claimsPrincipal)
         {
-            return InputAttribute.Roles == null
-                || InputAttribute.Roles.Count == 0 
-                || claimsPrincipal.IsInRole(InputAttribute.Roles);
+            return claimsPrincipal.IsInScope(InputAttribute.ScopeRequired)
+                && claimsPrincipal.IsInRole(InputAttribute.Roles);
         }
     }
 }

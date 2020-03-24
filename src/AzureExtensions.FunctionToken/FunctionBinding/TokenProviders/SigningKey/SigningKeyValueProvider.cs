@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using Microsoft.AspNetCore.Http;
@@ -11,16 +12,26 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKe
     /// <summary>
     /// Provides values loaded from Azure B2C.
     /// </summary>
-    internal class SingingKeyValueProvider : BearerTokenValueProvider
+    internal class SigningKeyValueProvider : BearerTokenValueProvider
     {
         private readonly TokenSinginingKeyOptions options;
 
         /// <inheritdoc />
-        public SingingKeyValueProvider(
+        public SigningKeyValueProvider(
             HttpRequest request,
             TokenSinginingKeyOptions options,
             FunctionTokenAttribute attribute)
-            : base(request, options, attribute)
+            : this(request, options, attribute, new JwtSecurityTokenHandler())
+        {
+            this.options = options;
+        }
+
+        public SigningKeyValueProvider(
+            HttpRequest request,
+            TokenSinginingKeyOptions options,
+            FunctionTokenAttribute attribute,
+            ISecurityTokenValidator securityHandler)
+            : base(request, options, attribute, securityHandler)
         {
             this.options = options;
         }

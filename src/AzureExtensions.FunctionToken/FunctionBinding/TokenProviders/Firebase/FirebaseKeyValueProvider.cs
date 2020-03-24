@@ -27,7 +27,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase
             HttpRequest request,
             FireBaseOptions options,
             FunctionTokenAttribute attribute)
-            : base(request, options, attribute)
+            : base(request, options, attribute, null)
         {
             this.options = options;
         }
