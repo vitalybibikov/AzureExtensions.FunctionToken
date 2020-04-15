@@ -13,11 +13,6 @@ namespace AzureExtensions.FunctionToken.Extensions
     {
         public static IWebJobsBuilder AddAzureFunctionsToken(this IWebJobsBuilder builder, ITokenOptions options)
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
