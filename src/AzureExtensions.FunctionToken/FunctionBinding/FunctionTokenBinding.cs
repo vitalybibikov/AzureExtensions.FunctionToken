@@ -46,7 +46,7 @@ namespace AzureExtensions.FunctionToken.FunctionBinding
                         tokenAzureB2COptions,
                         attribute));
             }
-            else if (options is TokenSinginingKeyOptions tokenSinginingKeyOptions)
+            else if (options is TokenSigningKeyOptions tokenSinginingKeyOptions)
             {
                 return Task.FromResult<IValueProvider>(
                     new SingingKeyValueProvider(

@@ -13,12 +13,12 @@ namespace AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.SigningKe
     /// </summary>
     internal class SingingKeyValueProvider : BearerTokenValueProvider
     {
-        private readonly TokenSinginingKeyOptions options;
+        private readonly TokenSigningKeyOptions options;
 
         /// <inheritdoc />
         public SingingKeyValueProvider(
             HttpRequest request,
-            TokenSinginingKeyOptions options,
+            TokenSigningKeyOptions options,
             FunctionTokenAttribute attribute)
             : base(request, options, attribute)
         {

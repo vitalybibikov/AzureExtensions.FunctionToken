@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/vitalybibikov/AzureExtensions.FunctionToken</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>AzureFunctions Azure B2C ClaimsPrincipal Firebase FirebaseAdmin</PackageTags>
-    <Version>1.0.12</Version>
+    <Version>1.0.13</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -22,9 +22,9 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="FirebaseAdmin" Version="1.10.0">
+    <PackageReference Include="FirebaseAdmin" Version="1.12.0">
     </PackageReference>
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.5.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.5.0">
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.5.1">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <AdditionalFiles Include="..\..\stylecop.json" />

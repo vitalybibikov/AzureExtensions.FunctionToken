@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AzureExtensions.FunctionToken.FunctionBinding.Options
 {
-    public sealed class TokenSinginingKeyOptions : ITokenOptions
+    public sealed class TokenSigningKeyOptions : ITokenOptions
     {
         public JsonWebKey SigningKey { get; set; }
 
