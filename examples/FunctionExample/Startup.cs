@@ -25,9 +25,9 @@ namespace FunctionExample
 
             builder.Services.AddHttpContextAccessor();
 
-            builder.AddAzureFunctionsToken(new FireBaseOptions()
+            builder.AddFirebase(new FireBaseOptions()
             {
-                GoogleServiceAccountJsonUri = new Uri("%HERE%")
+                GoogleServiceAccountJsonUri = new Uri("https://secretstorage.blob.core.windows.net/firebase-client-local/zalik-client-local-firebase-adminsdk-ujhgt-944902da1e.json?sp=r&st=2020-02-15T14:22:54Z&se=2099-02-15T22:22:54Z&spr=https&sv=2019-02-02&sr=b&sig=etW2CaJzVFr%2F4SaS9jDpbLNTtDXFC8BWp7FAJGV%2FU40%3D")
             });
         }
     }

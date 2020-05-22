@@ -1,6 +1,8 @@
 ﻿using System;
 using AzureExtensions.FunctionToken.FunctionBinding;
+using AzureExtensions.FunctionToken.FunctionBinding.Options;
 using AzureExtensions.FunctionToken.FunctionBinding.Options.Interface;
+using AzureExtensions.FunctionToken.FunctionBinding.TokenProviders.Firebase;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +22,21 @@ namespace AzureExtensions.FunctionToken.Extensions
 
             builder.AddExtension<FunctionTokenExtensionProvider>();
             builder.Services.AddSingleton(options);
+
+            return builder;
+        }
+
+        public static IWebJobsBuilder AddFirebase(this IWebJobsBuilder builder, FireBaseOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            FirebaseFactory.Load(options.GoogleServiceAccountJsonUri).GetAwaiter().GetResult();
+
+            builder.AddExtension<FunctionTokenExtensionProvider>();
+            builder.Services.AddSingleton<ITokenOptions>(options);
 
             return builder;
         }
